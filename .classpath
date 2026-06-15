@@ -1,0 +1,5 @@
+<classpath>
+    <classpathentry kind="phoenix" path="src"/>
+    <classpathentry kind="lib" path="lib/servlet-api.jar"/>
+    <classpathentry kind="output" path="bin"/>
+</classpath>
