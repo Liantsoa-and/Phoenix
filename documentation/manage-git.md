@@ -1,0 +1,308 @@
+Ton workflow est correct et ressemble à une méthode Git Flow simplifiée. Voici comment procéder étape par étape.
+
+### 1. Cloner le dépôt
+
+Si le dépôt existe déjà sur GitHub :
+
+```bash
+git clone https://github.com/ton-compte/mon-projet.git
+cd mon-projet
+```
+
+Vérifie les branches :
+
+```bash
+git branch -a
+```
+
+Tu devrais voir :
+
+```text
+* main
+```
+
+---
+
+### 2. Créer la branche Sprint 0
+
+À partir de `main` :
+
+```bash
+git checkout main
+git pull origin main
+git checkout -b sprint-0
+```
+
+Ou avec la commande moderne :
+
+```bash
+git switch -c sprint-0
+```
+
+Publier la branche sur GitHub :
+
+```bash
+git push -u origin sprint-0
+```
+
+---
+
+### 3. Travailler sur Sprint 0
+
+Après chaque modification :
+
+```bash
+git add .
+git commit -m "Ajout fonctionnalité X"
+git push
+```
+
+Pour récupérer les modifications distantes de la branche :
+
+```bash
+git pull
+```
+
+Comme le `-u origin sprint-0` a été fait précédemment, Git sait déjà où pousser et tirer.
+
+---
+
+### 4. Mettre à jour Sprint 0 avec Main
+
+Si quelqu'un a modifié `main` entre-temps :
+
+```bash
+git checkout main
+git pull origin main
+
+git checkout sprint-0
+git merge main
+```
+
+Ou :
+
+```bash
+git rebase main
+```
+
+(si vous préférez un historique plus propre).
+
+---
+
+### 5. Créer une Pull Request
+
+Quand Sprint 0 est terminé :
+
+1. Aller sur GitHub.
+2. Ouvrir le dépôt.
+3. Cliquer sur **Compare & Pull Request**.
+4. Vérifier :
+
+```text
+base: main
+compare: sprint-0
+```
+
+5. Créer la Pull Request.
+6. Vérifier les changements.
+7. Faire **Merge Pull Request**.
+
+ou
+
+#### Installation
+
+Sous Ubuntu :
+
+```bash
+sudo apt install gh
+```
+
+Ou suivre les instructions de :
+
+[GitHub CLI Installation Guide](https://cli.github.com/manual/installation?utm_source=chatgpt.com)
+
+---
+
+#### Première connexion
+
+```bash
+gh auth login
+```
+
+Choisis :
+
+```text
+GitHub.com
+HTTPS
+Login with a web browser
+```
+
+---
+
+#### Créer une Pull Request
+
+Supposons que :
+
+* branche source : `sprint-0`
+* branche cible : `main`
+
+Après avoir poussé la branche :
+
+```bash
+git push -u origin sprint-0
+```
+
+Créer la PR :
+
+```bash
+gh pr create \
+  --base main \
+  --head sprint-0 \
+  --title "Sprint 0" \
+  --body "Implémentation du sprint 0"
+```
+
+GitHub renvoie alors l'URL de la Pull Request.
+
+---
+
+#### Voir les Pull Requests
+
+```bash
+gh pr list
+```
+
+ou
+
+```bash
+gh pr view
+```
+
+---
+
+#### Fusionner la Pull Request
+
+Une fois la revue terminée :
+
+```bash
+gh pr merge
+```
+
+Ou directement :
+
+```bash
+gh pr merge --merge
+```
+
+Pour un merge classique.
+
+Autres options :
+
+```bash
+gh pr merge --squash
+```
+
+ou
+
+```bash
+gh pr merge --rebase
+```
+
+---
+
+#### Supprimer la branche après le merge
+
+```bash
+git checkout main
+git pull
+
+git branch -d sprint-0
+git push origin --delete sprint-0
+```
+
+---
+
+Workflow complet :
+
+```bash
+git checkout -b sprint-0
+
+# développement...
+
+git add .
+git commit -m "Sprint 0"
+git push -u origin sprint-0
+
+gh pr create --base main --head sprint-0
+
+gh pr merge --merge
+
+git checkout main
+git pull
+
+git branch -d sprint-0
+git push origin --delete sprint-0
+```
+
+Si tu travailles seul, tu peux même automatiser tout cela avec un script `release.sh` qui crée la PR, la fusionne et supprime la branche en une seule commande.
+
+
+---
+
+### 6. Supprimer Sprint 0
+
+Après le merge :
+
+Sur GitHub :
+
+```text
+Delete branch sprint-0
+```
+
+Ou en local :
+
+```bash
+git checkout main
+git pull origin main
+
+git branch -d sprint-0
+```
+
+Et si elle existe encore sur le serveur :
+
+```bash
+git push origin --delete sprint-0
+```
+
+---
+
+### Pour le Sprint 1
+
+On recommence depuis `main` :
+
+```bash
+git checkout main
+git pull origin main
+
+git checkout -b sprint-1
+git push -u origin sprint-1
+```
+
+Le cycle devient :
+
+```text
+main
+ └── sprint-0
+      └── Pull Request → main
+      └── suppression
+
+main
+ └── sprint-1
+      └── Pull Request → main
+      └── suppression
+
+main
+ └── sprint-2
+      └── Pull Request → main
+      └── suppression
+```
