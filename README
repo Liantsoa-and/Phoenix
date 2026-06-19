@@ -1,1 +1,28 @@
 **PROJET PHOENIX**
+
+# Sprint-0 :
+Tout url passer dans le naviguateur doit apparaitre en fenetre naviguateur :
+- tous les requetes http passent par FrontControllerServlet et ca sera grace a processRequest qu'on aura les requetes http
+
+# Sprint-1 : Découverte des Controllers
+## Objectif
+Afficher la liste de tous les contrôleurs au démarrage de l'application.
+## Tâches
+### 1. Configuration
+- [ ] Déclarer le paramètre `controllerPackage` dans `web.xml`
+- [ ] Récupérer ce paramètre dans la méthode `init()` du `FrontControllerServlet`
+### 2. Scanner les classes
+- [ ] Parcourir le package spécifié
+- [ ] Charger chaque classe du package
+- [ ] Vérifier la présence de l'annotation `@Controller`
+### 3. Enregistrement
+- [ ] Récupérer le nom complet de chaque classe annotée
+- [ ] Stocker les noms dans une liste
+### 4. Affichage
+- [ ] Afficher la liste des contrôleurs trouvés dans la console
+## Points clés simplifiés
+1. **Paramètre web.xml** → Une seule ligne de configuration
+2. **Scan simple** → Lecture du dossier, chargement des classes
+3. **Vérification** → Présence de l'annotation `@Controller`
+4. **Affichage** → Liste simple sur naviguateur uniquement pour ce sprint
+5. **Stockage** → Liste pour usage futur
