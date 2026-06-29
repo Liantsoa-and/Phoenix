@@ -13,11 +13,10 @@ import java.util.*;
 
 public class FrontControllerServlet extends HttpServlet {
 
-    private final Map<String, Method> routes = new HashMap<>();
-    private final Map<String, Object> instances = new HashMap<>();
     private final List<String> controllerNames = new ArrayList<>();
 
-    private final List<UrlEntry> urlEntries = new ArrayList<>();
+    // private final List<UrlEntry> urlEntries = new ArrayList<>();
+    private final Map<String, UrlEntry> routes = new LinkedHashMap<>();
 
     @Override
     public void init() throws ServletException {
@@ -29,7 +28,7 @@ public class FrontControllerServlet extends HttpServlet {
         try {
             scanPackage(packageName);
             log("Phoenix: " + controllerNames.size() + " contrôleur(s) enregistré(s).");
-            log("Phoenix: " + urlEntries.size() + " @UrlMapping(s) enregistré(s).");
+            log("Phoenix: " + /* urlEntries. */ routes.size() + " @UrlMapping(s) enregistré(s).");
         } catch (Exception e) {
             throw new ServletException("Phoenix: échec du scan du package " + packageName, e);
         }
@@ -75,7 +74,7 @@ public class FrontControllerServlet extends HttpServlet {
         PrintWriter pw = res.getWriter();
         pw.println("URL introuvable : " + path + "\n");
         pw.println("URLs valides :\n");
-        for (UrlEntry entry : urlEntries) {
+        for (UrlEntry entry : /* urlEntries */ routes.values()) {
             pw.println(entry.getUrl() + " -> " + entry.getControllerName() + "/" + entry.getMethod().getName() + "\n");
         }
 
@@ -90,12 +89,13 @@ public class FrontControllerServlet extends HttpServlet {
     }
 
     private UrlEntry findMatch(String path) {
-        for (UrlEntry entry : urlEntries) {
-            if (entry.getUrl().equals(path)) {
-                return entry;
-            }
-        }
-        return null;
+        // for (UrlEntry entry : urlEntries) {
+        // if (entry.getUrl().equals(path)) {
+        // return entry;
+        // }
+        // }
+        // return null;
+        return routes.get(path);
     }
 
     private void registerController(Class<?> clazz) throws Exception {
@@ -104,7 +104,11 @@ public class FrontControllerServlet extends HttpServlet {
             if (method.isAnnotationPresent(UrlMapping.class)) {
                 String mappedUrl = method.getAnnotation(UrlMapping.class).value();
                 if (mappedUrl != null && !mappedUrl.isBlank()) {
-                    urlEntries.add(new UrlEntry(mappedUrl, clazz.getSimpleName(), method));
+                    // urlEntries.add(new UrlEntry(mappedUrl, clazz.getSimpleName(), method));
+                    if (routes.containsKey(mappedUrl)) {
+                        throw new ServletException("@UrlMapping dupliqué: " + mappedUrl);
+                    }
+                    routes.put(mappedUrl, new UrlEntry(mappedUrl, clazz.getSimpleName(), method));
                 }
             }
         }
