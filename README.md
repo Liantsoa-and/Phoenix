@@ -26,6 +26,14 @@ L'objectif de ce sprint est de permettre à une même URL d'être déclarée plu
 
 Aucune solution technique n'a encore été choisie pour ce sprint, l'objectif ci-dessus est pour l'instant la seule chose arrêtée.
 
+Merci pour le texte. Voici votre sprint rédigé proprement, sans ajout ni suppression de contenu :
+
+---
+
+## Sprint-3-bis : Exécution des fonctions appelées
+
+L'objectif de ce sprint est de pouvoir exécuter une fonction appelée.
+
 ---
 
 ## Déploiement
