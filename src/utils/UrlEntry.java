@@ -7,11 +7,13 @@ public class UrlEntry {
     private final String url;
     private final String controllerName;
     private final Method method;
+    private final String httpMethod;
 
-    public UrlEntry(String url, String controllerName, Method method) {
+    public UrlEntry(String url, String controllerName, Method method, String httpMethod) {
         this.url = url;
         this.controllerName = controllerName;
         this.method = method;
+        this.httpMethod = httpMethod;
     }
 
     // Getters
@@ -27,9 +29,13 @@ public class UrlEntry {
         return method;
     }
 
+    public String getHttpMethod() {
+        return httpMethod;
+    }
+
     @Override
     public String toString() {
-        return url + " → " + controllerName + "#" + method.getName();
+        return httpMethod + " " + url + " -> " + controllerName + "#" + method.getName();
     }
 
     // equals et hashCode
@@ -37,12 +43,12 @@ public class UrlEntry {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        UrlEntry urlEntry = (UrlEntry) o;
-        return Objects.equals(url, urlEntry.url) && Objects.equals(controllerName, urlEntry.controllerName) && Objects.equals(method, urlEntry.method);
+        UrlEntry that = (UrlEntry) o;
+        return Objects.equals(url, that.url) && Objects.equals(httpMethod, that.httpMethod);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(url, controllerName, method);
+        return Objects.hash(url, httpMethod);
     }
 }   

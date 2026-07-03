@@ -16,6 +16,8 @@ public class FrontControllerServlet extends HttpServlet {
     private final List<String> controllerNames = new ArrayList<>();
 
     // private final List<UrlEntry> urlEntries = new ArrayList<>();
+    // sprint-3 : nouvelle clé
+    // clé = url + "_" + méthode HTTP (ex: /hello_GET, /hello_POST)
     private final Map<String, UrlEntry> routes = new LinkedHashMap<>();
 
     @Override
@@ -61,21 +63,22 @@ public class FrontControllerServlet extends HttpServlet {
         }
 
         // sprint-2 : mapper l'URL vers le contrôleur / méthode
-        UrlEntry match = findMatch(path);
+        UrlEntry match = findMatch(path, req.getMethod());
 
         if (match != null) {
             PrintWriter pw = res.getWriter();
             pw.println("URL trouvée : " + match.getUrl() + "\n");
+            pw.println("Méthode HTTP : " + match.getHttpMethod() + "\n");
             pw.println("Controller   : " + match.getControllerName() + "\n");
             pw.println("Methode      : " + match.getMethod().getName() + "\n");
             return;
         }
 
         PrintWriter pw = res.getWriter();
-        pw.println("URL introuvable : " + path + "\n");
+        pw.println("URL introuvable (ou méthode http non supportée): " + path + "\n");
         pw.println("URLs valides :\n");
         for (UrlEntry entry : /* urlEntries */ routes.values()) {
-            pw.println(entry.getUrl() + " -> " + entry.getControllerName() + "/" + entry.getMethod().getName() + "\n");
+            pw.println(entry.getHttpMethod() + " " + entry.getUrl() + " -> " + entry.getControllerName() + "/" + entry.getMethod().getName() + "\n");
         }
 
     }
@@ -88,27 +91,36 @@ public class FrontControllerServlet extends HttpServlet {
         }
     }
 
-    private UrlEntry findMatch(String path) {
+    private UrlEntry findMatch(String path, String httpMethod) {
         // for (UrlEntry entry : urlEntries) {
         // if (entry.getUrl().equals(path)) {
         // return entry;
         // }
         // }
         // return null;
-        return routes.get(path);
+        return routes.get(buildKey(path, httpMethod));
+    }
+
+    private String buildKey(String url, String httpMethod){
+        return url + "_" + httpMethod; 
     }
 
     private void registerController(Class<?> clazz) throws Exception {
         for (Method method : clazz.getDeclaredMethods()) {
             method.setAccessible(true);
             if (method.isAnnotationPresent(UrlMapping.class)) {
-                String mappedUrl = method.getAnnotation(UrlMapping.class).value();
+                UrlMapping annotation = method.getAnnotation(UrlMapping.class);
+                String mappedUrl = annotation.value();
+                String httpMethod = annotation.method(); 
                 if (mappedUrl != null && !mappedUrl.isBlank()) {
                     // urlEntries.add(new UrlEntry(mappedUrl, clazz.getSimpleName(), method));
-                    if (routes.containsKey(mappedUrl)) {
-                        throw new ServletException("@UrlMapping dupliqué: " + mappedUrl);
+                    UrlEntry candidate = new UrlEntry(mappedUrl, clazz.getSimpleName(), method, httpMethod);
+                    String key = buildKey(mappedUrl, httpMethod);
+                    // doublon reel : meme url et meme httpMethode
+                    if (routes.containsKey(key) && routes.get(key).equals(candidate)) {
+                        throw new ServletException("@UrlMapping dupliqué: " + httpMethod + " " + mappedUrl);
                     }
-                    routes.put(mappedUrl, new UrlEntry(mappedUrl, clazz.getSimpleName(), method));
+                    routes.put(key, candidate);
                 }
             }
         }
