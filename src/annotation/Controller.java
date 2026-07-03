@@ -3,7 +3,7 @@ package annotation;
 import java.lang.annotation.*;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)  // pour class et interface 
+@Target(ElementType.TYPE)  
 public @interface Controller {
     String value() default ""; 
 }
