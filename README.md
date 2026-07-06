@@ -26,6 +26,16 @@ L'objectif de ce sprint est de permettre à une même URL d'être déclarée plu
 
 Aucune solution technique n'a encore été choisie pour ce sprint, l'objectif ci-dessus est pour l'instant la seule chose arrêtée.
 
+## Sprint-3-bis : Exécution des fonctions appelées
+
+L'objectif de ce sprint est de pouvoir exécuter une fonction appelée.
+
+## Sprint-4 : Appel au démarrage de l'appli web de toutes les listes de controllers
+
+L'objectif de ce sprint est de permettre à l'appli d'avoir tout de suite la liste des controllers comme précédemment, mais au démarrage de l'appli.
+
+Ce qui est recommandé est de faire un listener pour écouter le démarrage de l'appli et de pouvoir remplir le map d'url.
+
 ---
 
 ## Déploiement
