@@ -16,25 +16,28 @@ public class FrontControllerServlet extends HttpServlet {
     private List<String> controllerNames;
     private Map<String, UrlEntry> routes;
 
-    @Override
-    public void init() throws ServletException {
-        String packageName = getServletConfig().getInitParameter("controllerPackage");
-        if (packageName == null || packageName.isBlank()) {
-            log("Phoenix: aucun controllerPackage configuré.");
-            return;
-        }
-
-        ServletContext sc = getServletContext();
-        this.controllerNames = (List<String>) sc.getAttribute("controllerNames");
-        this.routes = (Map<String, UrlEntry>) sc.getAttribute("routes");
-
-        if (this.controllerNames == null || this.routes == null) {
-            throw new ServletException("Phoenix: les attributs controllerNames ou routes ne sont pas définis dans le contexte. Vérifiez que le listener AppInitializer est bien configuré.");
-        }
-
-        log("Phoenix: " + this.controllerNames.size() + " contrôleur(s) récupéré(s) depuis le contexte.");
-        log("Phoenix: " + this.routes.size() + " @UrlMapping(s) récupéré(s) depuis le contexte.");
-    }
+    /*
+     * @Override
+     * public void init() throws ServletException {
+     * String packageName =
+     * getServletConfig().getInitParameter("controllerPackage");
+     * if (packageName == null || packageName.isBlank()) {
+     * log("Phoenix: aucun controllerPackage configuré.");
+     * return;
+     * }
+     * 
+     * if (this.controllerNames == null || this.routes == null) {
+     * throw new
+     * ServletException("Phoenix: les attributs controllerNames ou routes ne sont pas définis dans le contexte. Vérifiez que le listener AppInitializer est bien configuré."
+     * );
+     * }
+     * 
+     * log("Phoenix: " + this.controllerNames.size() +
+     * " contrôleur(s) récupéré(s) depuis le contexte.");
+     * log("Phoenix: " + this.routes.size() +
+     * " @UrlMapping(s) récupéré(s) depuis le contexte.");
+     * }
+     */
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res)
@@ -48,8 +51,18 @@ public class FrontControllerServlet extends HttpServlet {
         processRequest(req, res);
     }
 
+    @SuppressWarnings("unchecked")
     private void processRequest(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
+
+        ServletContext sc = getServletContext();
+        List<String> controllerNames = (List<String>) sc.getAttribute("controllerNames");
+        Map<String, UrlEntry> routes = (Map<String, UrlEntry>) sc.getAttribute("routes");
+
+        if (controllerNames == null || routes == null) {
+            throw new ServletException(
+                    "Phoenix: les attributs controllerNames ou routes ne sont pas définis dans le contexte. Vérifiez que le listener AppInitializer est bien configuré.");
+        }
 
         String path = req.getServletPath();
 
@@ -63,7 +76,7 @@ public class FrontControllerServlet extends HttpServlet {
         }
 
         // sprint-2 : mapper l'URL vers le contrôleur / méthode
-        UrlEntry match = findMatch(path, req.getMethod());
+        UrlEntry match = findMatch(routes, path, req.getMethod());
 
         if (match != null) {
             try {
@@ -116,8 +129,8 @@ public class FrontControllerServlet extends HttpServlet {
                     + entry.getMethod().getName() + "\n");
         }
     }
-
-    private UrlEntry findMatch(String path, String httpMethod) {
+    
+    private UrlEntry findMatch(Map<String, UrlEntry> routes, String path, String httpMethod) {
         return routes.get(buildKey(path, httpMethod));
     }
 
