@@ -4,6 +4,8 @@ import annotation.Controller;
 import annotation.UrlMapping;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
+import models.ModelAndView;
+import models.ViewResolver;
 import utils.ClassScanner;
 import utils.UrlEntry;
 
@@ -15,6 +17,7 @@ public class FrontControllerServlet extends HttpServlet {
 
     private List<String> controllerNames;
     private Map<String, UrlEntry> routes;
+    private ViewResolver viewResolver = new ViewResolver();
 
     /*
      * @Override
@@ -90,9 +93,10 @@ public class FrontControllerServlet extends HttpServlet {
                 Method methodToInvoke = match.getMethod();
 
                 // Invoke the method with request and response parameters
-                methodToInvoke.invoke(controllerInstance, req, res);
+                Object result = methodToInvoke.invoke(controllerInstance, req, res);
 
-                // Method execution completed - the method should have handled the response
+                // sprint-3 : traiter le résultat selon son type (compatibilité conservée)
+                handleResult(result, req, res);
                 return;
             } catch (ClassNotFoundException e) {
                 res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
@@ -130,6 +134,38 @@ public class FrontControllerServlet extends HttpServlet {
         }
     }
     
+    private void handleResult(Object result, HttpServletRequest req, HttpServletResponse res)
+            throws ServletException, IOException {
+
+        if (result == null) {
+            // void, ou contrôleur qui a déjà écrit la réponse lui-même (cf. TestController)
+            return;
+        }
+
+        String viewName;
+
+        if (result instanceof ModelAndView) {
+            ModelAndView mv = (ModelAndView) result;
+            for (Map.Entry<String, Object> entry : mv.getAttributes().entrySet()) {
+                req.setAttribute(entry.getKey(), entry.getValue());
+            }
+            viewName = mv.getViewName();
+        } else if (result instanceof String) {
+            // ancien comportement : juste un nom de vue, sans attributs
+            viewName = (String) result;
+        } else {
+            // type de retour non géré : on ne fait rien de plus
+            return;
+        }
+
+        if (viewName == null || viewName.isBlank()) {
+            return;
+        }
+
+        String viewPath = viewResolver.resolveViewName(viewName);
+        req.getRequestDispatcher(viewPath).forward(req, res);
+    }
+
     private UrlEntry findMatch(Map<String, UrlEntry> routes, String path, String httpMethod) {
         return routes.get(buildKey(path, httpMethod));
     }
