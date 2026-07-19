@@ -40,6 +40,8 @@ Ce qui est recommandé est de faire un listener pour écouter le démarrage de l
 Créer une page de liste en récupérant les données en dure. Le contrôleur appelle directement les données et retourne un ModelAndView contenant la vue à afficher ainsi que les données à transmettre.
 
 ### Sprint 5-bis connection à Spring
+Objectif : avoir un seul conteneur spring, laisser spring gerer repository et service, notre framework gere controller, on peut avoir de classes utile pour avoir ca
+
 - dans frontcontrollerlistner :
     - ajout d'un variable static final SPRING_ROOT
     - mettre valeur de SPRING_ROOT à "org.springframework.web.context.WebApplicationContext.ROOT"
@@ -56,7 +58,7 @@ Créer une page de liste en récupérant les données en dure. Le contrôleur ap
                 - invoker la methode en mettant en argument le springcontext :
                     - result = (ModelAndView) method.invoke(obj,  springContext);
             - sinon : invocation simple comme avant
-            
+
 ---
 
 ## Déploiement
