@@ -1,11 +1,11 @@
 package models;
 
 public class ViewResolver {
-    private String prefix = "/views/";
-    private String suffix = ".jsp";  // ou .html
-    
+
+    private String prefix = "/WEB-INF/views/";
+    private String suffix = ".jsp";
+
     public String resolveViewName(String viewName) {
-        // Transforme "home" → "/views/home.jsp"
         return prefix + viewName + suffix;
     }
 }

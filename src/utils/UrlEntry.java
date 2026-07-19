@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.Objects;
 
 public class UrlEntry {
+
     private final String url;
     private final String controllerName;
     private final Method method;
@@ -16,7 +17,6 @@ public class UrlEntry {
         this.httpMethod = httpMethod;
     }
 
-    // Getters
     public String getUrl() {
         return url;
     }
@@ -35,20 +35,25 @@ public class UrlEntry {
 
     @Override
     public String toString() {
-        return httpMethod + " " + url + " -> " + controllerName + "#" + method.getName();
+        return "UrlEntry{" +
+                "url='" + url + '\'' +
+                ", controllerName='" + controllerName + '\'' +
+                ", method=" + method +
+                ", httpMethod='" + httpMethod + '\'' +
+                '}';
     }
 
-    // equals et hashCode
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        UrlEntry that = (UrlEntry) o;
-        return Objects.equals(url, that.url) && Objects.equals(httpMethod, that.httpMethod);
+        UrlEntry urlEntry = (UrlEntry) o;
+        return Objects.equals(url, urlEntry.url) &&
+                Objects.equals(httpMethod, urlEntry.httpMethod);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(url, httpMethod);
     }
-}   
+}
