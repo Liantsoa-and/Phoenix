@@ -11,7 +11,7 @@ SRC_DIR="src"
 LIB_DIR="lib"
 BUILD_DIR="build"
 OUTPUT_JAR="framework.jar"
-PROJET_TEST_LIB="${PROJET_TEST_LIB:-../phoenix-test/lib}"
+PROJET_TEST_LIB="${PROJET_TEST_LIB:-../phoenix-test-fixed/lib}"
 
 # --- Couleurs ---
 GREEN='\033[0;32m'
