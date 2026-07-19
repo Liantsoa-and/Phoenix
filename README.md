@@ -37,9 +37,26 @@ L'objectif de ce sprint est de permettre à l'appli d'avoir tout de suite la lis
 Ce qui est recommandé est de faire un listener pour écouter le démarrage de l'appli et de pouvoir remplir le map d'url.
 
 ## Sprint-5 : ModelAndView
-objectif : page de liste, avy any anaty base de donnees, classe d'Acces au donnees repo, tsy asina service, repo -> controller, ao am repo atao spring
-en dure ao anaty methode le liste, alefa any am vue, m'identifeier oe izy no vue antsoiko manaraka, sy andefa ny donnee makany.
--> methode modelandview
+Créer une page de liste en récupérant les données en dure. Le contrôleur appelle directement les données et retourne un ModelAndView contenant la vue à afficher ainsi que les données à transmettre.
+
+### Sprint 5-bis connection à Spring
+- dans frontcontrollerlistner :
+    - ajout d'un variable static final SPRING_ROOT
+    - mettre valeur de SPRING_ROOT à "org.springframework.web.context.WebApplicationContext.ROOT"
+    - envoyer un attribut nommer springcontext qui contient la valeur de SPRING_ROOT dans le context :
+        servletContext.setAttribute("springContext", servletContext.getAttribute(SPRING_ROOT))
+- creation d'un classe Util :
+    - ajout de la fonction ststic boolean haveParameter(Method methode, Class<?> param) qui verifie si une methode à la classe param comme parametre
+- dans frontcontroller :
+    - recuperer le springcontext depuis le context et caster en WebApplicationContext
+    - changer l'invocation de la methode :
+        - verifier si la methode attend une parmetre WebApplication avec la fonction haveParam()
+            - si oui : 
+                - si springcontext == null : throw excepltion pas de springcontext
+                - invoker la methode en mettant en argument le springcontext :
+                    - result = (ModelAndView) method.invoke(obj,  springContext);
+            - sinon : invocation simple comme avant
+            
 ---
 
 ## Déploiement
