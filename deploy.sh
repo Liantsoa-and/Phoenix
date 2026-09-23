@@ -48,8 +48,9 @@ ok "Nettoyage OK"
 
 # --- 3. Compilation ---
 echo "==> Compilation du framework..."
+CLASSPATH="$SERVLET_JAR:$LIB_DIR/*"
 javac -encoding UTF-8 \
-      -cp "$SERVLET_JAR" \
+      -cp "$CLASSPATH" \
       -d "$BUILD_DIR/classes" \
       $(find "$SRC_DIR" -name "*.java") \
       || fail "Erreur de compilation"
