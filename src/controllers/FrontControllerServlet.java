@@ -8,9 +8,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import models.ModelAndView;
 import models.ViewResolver;
+import annotation.ApiWeb;
 import org.springframework.web.context.WebApplicationContext;
 import utils.UrlEntry;
 import utils.Util;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -59,6 +61,8 @@ public class FrontControllerServlet extends HttpServlet {
                     .getDeclaredConstructor().newInstance();
             Method method = entry.getMethod();
 
+            boolean isApi = method.isAnnotationPresent(ApiWeb.class);
+
             Object result;
             if (Util.haveParameter(method, WebApplicationContext.class)) {
                 if (springContext == null) {
@@ -69,13 +73,21 @@ public class FrontControllerServlet extends HttpServlet {
                 result = method.invoke(controllerInstance);
             }
 
-            handleResult(result, req, resp);
+            handleResult(result, req, resp, isApi);
+
         } catch (ReflectiveOperationException e) {
             throw new ServletException("Erreur lors de l'invocation du controller", e);
         }
     }
 
-    private void handleResult(Object result, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    private void handleResult(Object result, HttpServletRequest req, HttpServletResponse resp, boolean isApi) throws ServletException, IOException {
+        if (isApi) {
+            resp.setContentType("application/json");
+            resp.setCharacterEncoding("UTF-8");
+            String jsonResponse = ObjectToJson(result);
+            resp.getWriter().write(jsonResponse);
+            return;
+        } 
         if (result instanceof ModelAndView modelAndView) {
             for (Map.Entry<String, Object> attr : modelAndView.getAttributes().entrySet()) {
                 req.setAttribute(attr.getKey(), attr.getValue());
@@ -98,5 +110,10 @@ public class FrontControllerServlet extends HttpServlet {
 
     private String buildKey(String httpMethod, String path) {
         return httpMethod + ":" + path;
+    }
+
+    private String ObjectToJson(Object o) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.writeValueAsString(o);
     }
 }
