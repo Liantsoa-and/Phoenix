@@ -44,7 +44,13 @@ public class FrontControllerServlet extends HttpServlet {
         ServletContext servletContext = getServletContext();
         this.routes = (Map<String, UrlEntry>) servletContext.getAttribute("routes");
 
+        // Avec <url-pattern>/</url-pattern>, le servlet est traité comme le
+        // servlet par défaut : getPathInfo() renvoie toujours null. C'est
+        // getServletPath() qui porte alors le chemin complet demandé.
         String path = req.getPathInfo();
+        if (path == null) {
+            path = req.getServletPath();
+        }
         String httpMethod = req.getMethod();
 
         UrlEntry entry = findMatch(routes, path, httpMethod);
