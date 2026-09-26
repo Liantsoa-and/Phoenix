@@ -55,7 +55,9 @@ public class FrontControllerServlet extends HttpServlet {
 
         UrlEntry entry = findMatch(routes, path, httpMethod);
         if (entry == null) {
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Aucune route pour " + httpMethod + " " + path);
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            resp.setContentType("text/html;charset=UTF-8");
+            resp.getWriter().write(buildRoutesNotFoundPage(httpMethod, path, routes));
             return;
         }
 
@@ -107,6 +109,24 @@ public class FrontControllerServlet extends HttpServlet {
         } else {
             resp.getWriter().write(String.valueOf(result));
         }
+    }
+
+    private String buildRoutesNotFoundPage(String httpMethod, String path, Map<String, UrlEntry> routes) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<html><head><title>404 - Route inconnue</title></head><body>");
+        sb.append("<h1>Aucune route pour ").append(httpMethod).append(" ").append(path).append("</h1>");
+        sb.append("<h2>URLs disponibles :</h2><table border=\"1\" cellpadding=\"5\">");
+        sb.append("<tr><th>Méthode</th><th>URL</th><th>Contrôleur</th><th>Méthode Java</th></tr>");
+        if (routes != null) {
+            for (UrlEntry e : routes.values()) {
+                sb.append("<tr><td>").append(e.getHttpMethod()).append("</td><td>")
+                  .append(e.getUrl()).append("</td><td>")
+                  .append(e.getControllerName()).append("</td><td>")
+                  .append(e.getMethod().getName()).append("</td></tr>");
+            }
+        }
+        sb.append("</table></body></html>");
+        return sb.toString();
     }
 
     private UrlEntry findMatch(Map<String, UrlEntry> routes, String path, String httpMethod) {
