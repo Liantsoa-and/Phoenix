@@ -92,7 +92,10 @@ public class FrontControllerServlet extends HttpServlet {
         if (isApi) {
             resp.setContentType("application/json");
             resp.setCharacterEncoding("UTF-8");
-            String jsonResponse = ObjectToJson(result);
+            // Sprint-6 : si la méthode renvoie déjà une String, on considère
+            // qu'elle a déjà produit du JSON elle-même -> pas de ré-encodage.
+            // Sinon (objet quelconque), on le convertit en JSON via Jackson.
+            String jsonResponse = (result instanceof String s) ? s : ObjectToJson(result);
             resp.getWriter().write(jsonResponse);
             return;
         } 
