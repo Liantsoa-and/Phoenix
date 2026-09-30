@@ -71,6 +71,40 @@ Objectif : construire un API, une methode sera appele et doit retourner automati
             - retourner une application json
         - sinon : 
             - on garde l'ancienne execution
+
+### Sprint-7 : Binding
+Objectif : faire enregistrer les données envoyées depuis un formulaire par paramètres, sans instanciation d’objet pour l’instant.- Créer un formulaire
+- Créer un controller qui envoie vers le formulaire
+  * Pas encore de changement au niveau du framework
+- Modifier le FrontServlet
+  * Vérifier si la requête contient des paramètres
+  * Si aucun paramètre → faire un `invoke` simple
+  * Si des paramètres existent :
+    * récupérer les paramètres de la requête
+    * récupérer leur nom et leur valeur
+    * faire le matching avec les paramètres de la méthode du controller
+    * ajouter les paramètres correspondants à l'appel de la méthode
+    * faire le `invoke`
+- Créer la méthode `save(...)` dans le controller
+  * Recevoir les paramètres du formulaire
+  * Pour l'instant, recevoir les paramètres directement, pas un objet
+- Relier le formulaire au `save()`
+  * Formulaire → bouton Submit
+  * Submit → URL
+  * URL → FrontServlet
+  * FrontServlet → mapper le controller
+  * Controller → `save(...)`
+- Tester le binding
+  * Vérifier les paramètres reçus avec `request.getParameter(...)`
+  * Vérifier que le nom du paramètre du formulaire correspond au nom du paramètre de la méthode
+  * Vérifier le nombre de paramètres
+  * Vérifier le matching
+  * Vérifier que les valeurs sont correctement passées au `invoke`
+- Cas particulier
+  * Pour l'instant, ce n'est pas un objet
+  * Si l'objet est `null`, prendre d'abord les paramètres de la requête
+  * L'instanciation et le binding vers un objet viendront plus tard
+
              
 ---
 
