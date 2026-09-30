@@ -74,8 +74,8 @@ Objectif : construire un API, une methode sera appele et doit retourner automati
 
 ### Sprint-7 : Binding
 Objectif : faire enregistrer les données envoyées depuis un formulaire par paramètres, sans instanciation d’objet pour l’instant.- Créer un formulaire
-- Créer un controller qui envoie vers le formulaire
-  * Pas encore de changement au niveau du framework
+- [x] Créer un controller qui envoie vers le formulaire
+  * [x] Pas encore de changement au niveau du framework
 - Modifier le FrontServlet
   * Vérifier si la requête contient des paramètres
   * Si aucun paramètre → faire un `invoke` simple
