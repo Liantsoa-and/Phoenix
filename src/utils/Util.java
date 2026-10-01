@@ -36,6 +36,7 @@ public class Util {
         for (int i = 0; i < parameters.length; i++) {
             String nom = parameters[i].getName();
             args[i] = req.getParameter(nom);
+            System.out.println("Paramètre : " + nom + " = " + args[i]);
         }
         return args;
     }

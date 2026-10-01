@@ -85,25 +85,25 @@ Objectif : faire enregistrer les données envoyées depuis un formulaire par par
     * [x] faire le matching avec les paramètres de la méthode du controller
     * [x] ajouter les paramètres correspondants à l'appel de la méthode
     * [x] faire le `invoke`
-- [wip] Créer la méthode `save(...)` dans le controller
-  * Recevoir les paramètres du formulaire
-  * Pour l'instant, recevoir les paramètres directement, pas un objet
-- Relier le formulaire au `save()`
-  * Formulaire → bouton Submit
-  * Submit → URL
-  * URL → FrontServlet
-  * FrontServlet → mapper le controller
-  * Controller → `save(...)`
-- Tester le binding
-  * Vérifier les paramètres reçus avec `request.getParameter(...)`
-  * Vérifier que le nom du paramètre du formulaire correspond au nom du paramètre de la méthode
-  * Vérifier le nombre de paramètres
-  * Vérifier le matching
-  * Vérifier que les valeurs sont correctement passées au `invoke`
-- Cas particulier
-  * Pour l'instant, ce n'est pas un objet
-  * Si l'objet est `null`, prendre d'abord les paramètres de la requête
-  * L'instanciation et le binding vers un objet viendront plus tard
+- [x] Créer la méthode `save(...)` dans le controller
+  * [x] Recevoir les paramètres du formulaire
+  * [x] Pour l'instant, recevoir les paramètres directement, pas un objet
+- [x] Relier le formulaire au `save()`
+  * [x] Formulaire → bouton Submit
+  * [x] Submit → URL
+  * [x] URL → FrontServlet
+  * [x] FrontServlet → mapper le controller
+  * [x] Controller → `save(...)`
+- [x] Tester le binding
+  * [x] Vérifier les paramètres reçus avec `request.getParameter(...)`
+  * [x] Vérifier que le nom du paramètre du formulaire correspond au nom du paramètre de la méthode
+  * [x] Vérifier le nombre de paramètres
+  * [x] Vérifier le matching
+  * [x] Vérifier que les valeurs sont correctement passées au `invoke`
+- [x] Cas particulier
+  * [x] Pour l'instant, ce n'est pas un objet
+  * [x] Si l'objet est `null`, prendre d'abord les paramètres de la requête
+  * [x] L'instanciation et le binding vers un objet viendront plus tard
 
              
 ---
