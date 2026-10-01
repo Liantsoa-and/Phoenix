@@ -76,10 +76,10 @@ Objectif : construire un API, une methode sera appele et doit retourner automati
 Objectif : faire enregistrer les données envoyées depuis un formulaire par paramètres, sans instanciation d’objet pour l’instant.- Créer un formulaire
 - [x] Créer un controller qui envoie vers le formulaire
   * [x] Pas encore de changement au niveau du framework
-- Modifier le FrontServlet
-  * Vérifier si la requête contient des paramètres
-  * Si aucun paramètre → faire un `invoke` simple
-  * Si des paramètres existent :
+- [x] Modifier le FrontServlet
+  * [x] Vérifier si la requête contient des paramètres
+  * [x] Si aucun paramètre → faire un `invoke` simple
+  * [wip] Si des paramètres existent :
     * récupérer les paramètres de la requête
     * récupérer leur nom et leur valeur
     * faire le matching avec les paramètres de la méthode du controller

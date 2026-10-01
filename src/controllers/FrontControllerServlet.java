@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Map;
 
@@ -44,9 +45,6 @@ public class FrontControllerServlet extends HttpServlet {
         ServletContext servletContext = getServletContext();
         this.routes = (Map<String, UrlEntry>) servletContext.getAttribute("routes");
 
-        // Avec <url-pattern>/</url-pattern>, le servlet est traité comme le
-        // servlet par défaut : getPathInfo() renvoie toujours null. C'est
-        // getServletPath() qui porte alors le chemin complet demandé.
         String path = req.getPathInfo();
         if (path == null) {
             path = req.getServletPath();
@@ -62,7 +60,6 @@ public class FrontControllerServlet extends HttpServlet {
         }
 
         try {
-            // Sprint 5-bis : récupération du contexte Spring publié par AppInitializer
             WebApplicationContext springContext = (WebApplicationContext) servletContext.getAttribute("springContext");
 
             Object controllerInstance = Class.forName(entry.getControllerName())
@@ -72,11 +69,18 @@ public class FrontControllerServlet extends HttpServlet {
             boolean isApi = method.isAnnotationPresent(ApiWeb.class);
 
             Object result;
+            Map<String, String[]> parameterMap = req.getParameterMap();
+
             if (Util.haveParameter(method, WebApplicationContext.class)) {
                 if (springContext == null) {
                     throw new ServletException("Le controller attend un WebApplicationContext mais aucun springContext n'est disponible");
                 }
                 result = method.invoke(controllerInstance, springContext);
+
+            } else if (!parameterMap.isEmpty()) {
+                Object[] args = Util.getParameter(method, req);
+                result = method.invoke(controllerInstance, args);
+
             } else {
                 result = method.invoke(controllerInstance);
             }

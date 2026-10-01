@@ -1,6 +1,7 @@
 package utils;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 
 public class Util {
 
@@ -26,5 +27,13 @@ public class Util {
             }
         }
         return false;
+    }
+
+    public static Parameter[] getParameter(Method method, HttpServletRequest req) {
+        Parameter[] parameters = new Parameter[method.getParameters().length];
+        for (int i = 0; i < method.getParameters().length; i++) {
+            parameters[i] = method.getParameters()[i];
+        }
+        return parameters;
     }
 }
