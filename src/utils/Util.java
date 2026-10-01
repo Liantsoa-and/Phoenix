@@ -2,6 +2,7 @@ package utils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class Util {
 
@@ -29,11 +30,13 @@ public class Util {
         return false;
     }
 
-    public static Parameter[] getParameter(Method method, HttpServletRequest req) {
-        Parameter[] parameters = new Parameter[method.getParameters().length];
-        for (int i = 0; i < method.getParameters().length; i++) {
-            parameters[i] = method.getParameters()[i];
+    public static Object[] getParameter(Method method, HttpServletRequest req) {
+        Parameter[] parameters = method.getParameters();
+        Object[] args = new Object[parameters.length];
+        for (int i = 0; i < parameters.length; i++) {
+            String nom = parameters[i].getName();
+            args[i] = req.getParameter(nom);
         }
-        return parameters;
+        return args;
     }
 }

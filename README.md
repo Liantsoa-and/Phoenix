@@ -79,13 +79,13 @@ Objectif : faire enregistrer les données envoyées depuis un formulaire par par
 - [x] Modifier le FrontServlet
   * [x] Vérifier si la requête contient des paramètres
   * [x] Si aucun paramètre → faire un `invoke` simple
-  * [wip] Si des paramètres existent :
-    * récupérer les paramètres de la requête
-    * récupérer leur nom et leur valeur
-    * faire le matching avec les paramètres de la méthode du controller
-    * ajouter les paramètres correspondants à l'appel de la méthode
-    * faire le `invoke`
-- Créer la méthode `save(...)` dans le controller
+  * [x] Si des paramètres existent :
+    * [x] récupérer les paramètres de la requête
+    * [x] récupérer leur nom et leur valeur
+    * [x] faire le matching avec les paramètres de la méthode du controller
+    * [x] ajouter les paramètres correspondants à l'appel de la méthode
+    * [x] faire le `invoke`
+- [wip] Créer la méthode `save(...)` dans le controller
   * Recevoir les paramètres du formulaire
   * Pour l'instant, recevoir les paramètres directement, pas un objet
 - Relier le formulaire au `save()`
