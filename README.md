@@ -73,7 +73,8 @@ Objectif : construire un API, une methode sera appele et doit retourner automati
             - on garde l'ancienne execution
 
 ### Sprint-7 : Binding
-Objectif : faire enregistrer les données envoyées depuis un formulaire par paramètres, sans instanciation d’objet pour l’instant.- Créer un formulaire
+Objectif : faire enregistrer les données envoyées depuis un formulaire par paramètres, sans instanciation d’objet pour l’instant.
+- [x] Créer un formulaire
 - [x] Créer un controller qui envoie vers le formulaire
   * [x] Pas encore de changement au niveau du framework
 - [x] Modifier le FrontServlet
@@ -118,4 +119,15 @@ cd Phoenix && ./deploy.sh
 cd ../phoenix-test && sudo ./deploy.sh
 ```
 
-URL de test : `http://localhost:8080/phoenix-test/home`
+---
+
+## Pour les logs de debug : catalina.out
+```bash
+tail -f /var/log/tomcat10/catalina.out
+```
+
+## activer tomlog : 
+
+```bash
+alias tomlog='tail -f /var/log/tomcat10/catalina.out'
+```
