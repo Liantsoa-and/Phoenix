@@ -70,6 +70,10 @@ echo "==> Copie vers $PROJET_TEST_LIB..."
 if [ -d "$PROJET_TEST_LIB" ]; then
     cp "$OUTPUT_JAR" "$PROJET_TEST_LIB/"
     ok "framework.jar copié dans $PROJET_TEST_LIB"
+
+    echo "==> Copie des dépendances du framework (Spring, Jackson...)..."
+    find "$LIB_DIR" -name "*.jar" ! -iname "servlet-api.jar" -exec cp {} "$PROJET_TEST_LIB/" \;
+    ok "Dépendances copiées dans $PROJET_TEST_LIB"
 else
     warn "Dossier $PROJET_TEST_LIB introuvable — copie ignorée."
     warn "Lancez : PROJET_TEST_LIB=/chemin/vers/lib ./deploy.sh"

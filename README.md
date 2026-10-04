@@ -39,7 +39,7 @@ Ce qui est recommandé est de faire un listener pour écouter le démarrage de l
 ## Sprint-5 : ModelAndView
 Créer une page de liste en récupérant les données en dure. Le contrôleur appelle directement les données et retourne un ModelAndView contenant la vue à afficher ainsi que les données à transmettre.
 
-### Sprint 5-bis connection à Spring
+### Sprint-5-bis connection à Spring
 Objectif : avoir un seul conteneur spring, laisser spring gerer repository et service, notre framework gere controller, on peut avoir de classes utile pour avoir ca
 - dans frontcontrollerlistner :
     - ajout d'un variable static final SPRING_ROOT
@@ -58,6 +58,54 @@ Objectif : avoir un seul conteneur spring, laisser spring gerer repository et se
                     - result = (ModelAndView) method.invoke(obj,  springContext);
             - sinon : invocation simple comme avant
 
+### Sprint-6 : WebAPI
+Objectif : construire un API, une methode sera appele et doit retourner automatiquement un json
+- creation d'une nouvelle annotation appeler apirest, apiweb ou apicontroller
+- dans frontcontroller :
+    - avant execution du dispatch
+        - si la methode de la classe contient la nouvelle annotation : 
+            - retourne une application json
+            - 2 cas, type de retour de la methode : 
+                - String (deja du json) : on retourne tout de suite la string dans l'app json
+                - autre que String (pas json) : on appelle une fonction toJSON pour convertir l'objet en JSON
+            - retourner une application json
+        - sinon : 
+            - on garde l'ancienne execution
+
+### Sprint-7 : Binding
+Objectif : faire enregistrer les données envoyées depuis un formulaire par paramètres, sans instanciation d’objet pour l’instant.- Créer un formulaire
+- Créer un controller qui envoie vers le formulaire
+  * Pas encore de changement au niveau du framework
+- Modifier le FrontServlet
+  * Vérifier si la requête contient des paramètres
+  * Si aucun paramètre → faire un `invoke` simple
+  * Si des paramètres existent :
+    * récupérer les paramètres de la requête
+    * récupérer leur nom et leur valeur
+    * faire le matching avec les paramètres de la méthode du controller
+    * ajouter les paramètres correspondants à l'appel de la méthode
+    * faire le `invoke`
+- Créer la méthode `save(...)` dans le controller
+  * Recevoir les paramètres du formulaire
+  * Pour l'instant, recevoir les paramètres directement, pas un objet
+- Relier le formulaire au `save()`
+  * Formulaire → bouton Submit
+  * Submit → URL
+  * URL → FrontServlet
+  * FrontServlet → mapper le controller
+  * Controller → `save(...)`
+- Tester le binding
+  * Vérifier les paramètres reçus avec `request.getParameter(...)`
+  * Vérifier que le nom du paramètre du formulaire correspond au nom du paramètre de la méthode
+  * Vérifier le nombre de paramètres
+  * Vérifier le matching
+  * Vérifier que les valeurs sont correctement passées au `invoke`
+- Cas particulier
+  * Pour l'instant, ce n'est pas un objet
+  * Si l'objet est `null`, prendre d'abord les paramètres de la requête
+  * L'instanciation et le binding vers un objet viendront plus tard
+
+             
 ---
 
 ## Déploiement
