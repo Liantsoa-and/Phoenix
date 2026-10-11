@@ -106,7 +106,23 @@ Objectif : faire enregistrer les données envoyées depuis un formulaire par par
   * [x] Si l'objet est `null`, prendre d'abord les paramètres de la requête
   * [x] L'instanciation et le binding vers un objet viendront plus tard
 
-             
+### Sprint-7 bis : Binding avec objet
+Objectif : pouvoir recevoir un objet (ex: `Employe`) dans la méthode du controller. Le framework instancie l’objet et remplit ses propriétés à partir des paramètres du formulaire.
+- [x] Modifier `Util.getParameter(...)`
+  - [x] Détecter si le paramètre de la méthode est un type simple (`String`, `int`…) ou un objet
+  - [x] Si type simple → garder le comportement actuel
+  - [x] Si objet :
+    - [x] Créer une instance avec le constructeur sans argument
+    - [x] Pour chaque propriété de l’objet, récupérer la valeur dans la requête et appeler le setter
+    - [x] Mettre l’objet rempli dans les arguments
+- [x] Modifier la méthode `save` du controller
+  - [x] Signature : `public Employe save(Employe employe)`
+  - [x] L’objet arrive déjà rempli
+  - [x] Retourner l’objet
+- [x] Tester
+  - [x] Envoyer le formulaire
+  - [x] Vérifier que l’objet est bien créé et rempli (`nom`, `poste`…)
+  - [x] Vérifier que le binding simple continue de marcher
 ---
 
 ## Déploiement
