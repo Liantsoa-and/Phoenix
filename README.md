@@ -73,37 +73,38 @@ Objectif : construire un API, une methode sera appele et doit retourner automati
             - on garde l'ancienne execution
 
 ### Sprint-7 : Binding
-Objectif : faire enregistrer les données envoyées depuis un formulaire par paramètres, sans instanciation d’objet pour l’instant.- Créer un formulaire
-- Créer un controller qui envoie vers le formulaire
-  * Pas encore de changement au niveau du framework
-- Modifier le FrontServlet
-  * Vérifier si la requête contient des paramètres
-  * Si aucun paramètre → faire un `invoke` simple
-  * Si des paramètres existent :
-    * récupérer les paramètres de la requête
-    * récupérer leur nom et leur valeur
-    * faire le matching avec les paramètres de la méthode du controller
-    * ajouter les paramètres correspondants à l'appel de la méthode
-    * faire le `invoke`
-- Créer la méthode `save(...)` dans le controller
-  * Recevoir les paramètres du formulaire
-  * Pour l'instant, recevoir les paramètres directement, pas un objet
-- Relier le formulaire au `save()`
-  * Formulaire → bouton Submit
-  * Submit → URL
-  * URL → FrontServlet
-  * FrontServlet → mapper le controller
-  * Controller → `save(...)`
-- Tester le binding
-  * Vérifier les paramètres reçus avec `request.getParameter(...)`
-  * Vérifier que le nom du paramètre du formulaire correspond au nom du paramètre de la méthode
-  * Vérifier le nombre de paramètres
-  * Vérifier le matching
-  * Vérifier que les valeurs sont correctement passées au `invoke`
-- Cas particulier
-  * Pour l'instant, ce n'est pas un objet
-  * Si l'objet est `null`, prendre d'abord les paramètres de la requête
-  * L'instanciation et le binding vers un objet viendront plus tard
+Objectif : faire enregistrer les données envoyées depuis un formulaire par paramètres, sans instanciation d’objet pour l’instant.
+- [x] Créer un formulaire
+- [x] Créer un controller qui envoie vers le formulaire
+  * [x] Pas encore de changement au niveau du framework
+- [x] Modifier le FrontServlet
+  * [x] Vérifier si la requête contient des paramètres
+  * [x] Si aucun paramètre → faire un `invoke` simple
+  * [x] Si des paramètres existent :
+    * [x] récupérer les paramètres de la requête
+    * [x] récupérer leur nom et leur valeur
+    * [x] faire le matching avec les paramètres de la méthode du controller
+    * [x] ajouter les paramètres correspondants à l'appel de la méthode
+    * [x] faire le `invoke`
+- [x] Créer la méthode `save(...)` dans le controller
+  * [x] Recevoir les paramètres du formulaire
+  * [x] Pour l'instant, recevoir les paramètres directement, pas un objet
+- [x] Relier le formulaire au `save()`
+  * [x] Formulaire → bouton Submit
+  * [x] Submit → URL
+  * [x] URL → FrontServlet
+  * [x] FrontServlet → mapper le controller
+  * [x] Controller → `save(...)`
+- [x] Tester le binding
+  * [x] Vérifier les paramètres reçus avec `request.getParameter(...)`
+  * [x] Vérifier que le nom du paramètre du formulaire correspond au nom du paramètre de la méthode
+  * [x] Vérifier le nombre de paramètres
+  * [x] Vérifier le matching
+  * [x] Vérifier que les valeurs sont correctement passées au `invoke`
+- [x] Cas particulier
+  * [x] Pour l'instant, ce n'est pas un objet
+  * [x] Si l'objet est `null`, prendre d'abord les paramètres de la requête
+  * [x] L'instanciation et le binding vers un objet viendront plus tard
 
              
 ---
@@ -118,4 +119,15 @@ cd Phoenix && ./deploy.sh
 cd ../phoenix-test && sudo ./deploy.sh
 ```
 
-URL de test : `http://localhost:8080/phoenix-test/home`
+---
+
+## Pour les logs de debug : catalina.out
+```bash
+tail -f /var/log/tomcat10/catalina.out
+```
+
+## activer tomlog : 
+
+```bash
+alias tomlog='tail -f /var/log/tomcat10/catalina.out'
+```

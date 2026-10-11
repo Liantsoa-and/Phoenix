@@ -51,6 +51,7 @@ echo "==> Compilation du framework..."
 CLASSPATH="$SERVLET_JAR:$LIB_DIR/*"
 javac -encoding UTF-8 \
       -cp "$CLASSPATH" \
+      -parameters \
       -d "$BUILD_DIR/classes" \
       $(find "$SRC_DIR" -name "*.java") \
       || fail "Erreur de compilation"
