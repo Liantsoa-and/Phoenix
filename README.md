@@ -123,6 +123,39 @@ Objectif : pouvoir recevoir un objet (ex: `Employe`) dans la méthode du control
   - [x] Envoyer le formulaire
   - [x] Vérifier que l’objet est bien créé et rempli (`nom`, `poste`…)
   - [x] Vérifier que le binding simple continue de marcher
+
+### Sprint-8 : Upload fichier
+Objectif : dans le formulaire on pourra envoyer un fichier, le fichier pourra etre traiter dans le framework, face au solution propose voici ce que j'ai pris :
+Voici une version du Sprint-8 dans le même format que le 7 :
+
+### Sprint-8 : Upload fichier
+Objectif : pouvoir envoyer un fichier depuis un formulaire et le récupérer dans la méthode du controller sous forme d'un objet `Fichier`, en réutilisant le mécanisme de binding existant.
+- [x] Créer la classe `Fichier`
+  - [x] Constructeur sans argument
+  - [x] Propriétés : `nom`, `typeContenu`, `taille`, `contenu` (`byte[]`)
+  - [x] Getters / setters
+- [ ] Préparer le formulaire
+  - [ ] Ajouter `enctype="multipart/form-data"` et `method="post"`
+  - [ ] Ajouter un `<input type="file" name="...">`
+  - [ ] Garder un champ texte normal pour vérifier que le mélange texte + fichier marche
+- [ ] Activer le multipart dans le framework
+  - [ ] Ajouter `@MultipartConfig` sur le `FrontControllerServlet`
+  - [ ] Vérifier que les requêtes non multipart se comportent comme avant
+- [ ] Modifier `Util.getParameter(...)`
+  - [ ] Détecter si le paramètre de la méthode est de type `Fichier`
+  - [ ] Si oui : récupérer la `Part` correspondante avec `request.getPart(nom)`
+  - [ ] Remplir l'objet `Fichier` (nom, type, taille, contenu) à partir de la `Part`
+  - [ ] Gérer le cas où aucun fichier n'est envoyé (`null` ou `Fichier` vide)
+  - [ ] Si autre type : garder le comportement actuel (type simple / objet)
+- [ ] Créer la méthode du controller
+  - [ ] Signature : `public ModelAndView upload(Fichier fichier)`
+  - [ ] Relier formulaire → URL → FrontServlet → controller
+- [ ] Tester
+  - [ ] Envoyer un petit fichier et vérifier `nom`, `typeContenu` et `taille`
+  - [ ] Vérifier que le contenu est identique à l'original
+  - [ ] Tester sans fichier
+  - [ ] Tester avec un fichier + des champs texte
+  - [ ] Vérifier que le binding simple et le binding objet marchent toujours
 ---
 
 ## Déploiement
