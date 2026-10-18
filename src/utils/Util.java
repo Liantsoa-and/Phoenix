@@ -1,8 +1,14 @@
 package utils;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Part;
 import jakarta.servlet.http.HttpServletRequest;
+import models.Fichier;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -69,6 +75,8 @@ public class Util {
 
             if (type == WebApplicationContext.class) {
                 value = springContext;
+            } else if (type == Fichier.class) {
+                value = resolveFile(name, req);
             } else if (isSimpleType(type) || isMultiValued(type)) {
                 value = resolveValue(type, parameters[i].getParameterizedType(), name, null, req);
             } else {
@@ -82,6 +90,45 @@ public class Util {
         }
 
         return args;
+    }
+
+    /** Récupère une partie fichier d'une requête multipart, si elle existe. */
+    private static Fichier resolveFile(String parameterName, HttpServletRequest req) {
+        String contentType = req.getContentType();
+        if (contentType == null
+                || !contentType.toLowerCase().startsWith("multipart/form-data")) {
+            return null;
+        }
+
+        try {
+            Part part = req.getPart(parameterName);
+            if (part == null) {
+                return null;
+            }
+
+            String submittedFileName = part.getSubmittedFileName();
+            if (submittedFileName == null || submittedFileName.trim().isEmpty() || part.getSize() == 0) {
+                return null;
+            }
+
+            Fichier fichier = new Fichier();
+            fichier.setNom(submittedFileName);
+            fichier.setTypeContenu(part.getContentType());
+            fichier.setTaille(part.getSize());
+            try (InputStream input = part.getInputStream();
+                 ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+                byte[] buffer = new byte[8192];
+                int count;
+                while ((count = input.read(buffer)) != -1) {
+                    output.write(buffer, 0, count);
+                }
+                fichier.setContenu(output.toByteArray());
+            }
+            return fichier;
+        } catch (IOException | ServletException e) {
+            throw new IllegalArgumentException(
+                    "Impossible de lire le fichier du paramètre '" + parameterName + "'", e);
+        }
     }
 
     // ------------------------------------------------------------------
@@ -181,9 +228,11 @@ public class Util {
 
         // List / Collection : on lit le type des éléments dans List<X>
         Class<?> elementType = String.class;
-        if (genericType instanceof ParameterizedType pt
-                && pt.getActualTypeArguments()[0] instanceof Class<?> c) {
-            elementType = c;
+        if (genericType instanceof ParameterizedType) {
+            Type element = ((ParameterizedType) genericType).getActualTypeArguments()[0];
+            if (element instanceof Class<?>) {
+                elementType = (Class<?>) element;
+            }
         }
 
         List<Object> list = new ArrayList<>();

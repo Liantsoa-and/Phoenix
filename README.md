@@ -134,28 +134,31 @@ Objectif : pouvoir envoyer un fichier depuis un formulaire et le récupérer dan
   - [x] Constructeur sans argument
   - [x] Propriétés : `nom`, `typeContenu`, `taille`, `contenu` (`byte[]`)
   - [x] Getters / setters
-- [ ] Préparer le formulaire
-  - [ ] Ajouter `enctype="multipart/form-data"` et `method="post"`
-  - [ ] Ajouter un `<input type="file" name="...">`
-  - [ ] Garder un champ texte normal pour vérifier que le mélange texte + fichier marche
-- [ ] Activer le multipart dans le framework
-  - [ ] Ajouter `@MultipartConfig` sur le `FrontControllerServlet`
-  - [ ] Vérifier que les requêtes non multipart se comportent comme avant
-- [ ] Modifier `Util.getParameter(...)`
-  - [ ] Détecter si le paramètre de la méthode est de type `Fichier`
-  - [ ] Si oui : récupérer la `Part` correspondante avec `request.getPart(nom)`
-  - [ ] Remplir l'objet `Fichier` (nom, type, taille, contenu) à partir de la `Part`
-  - [ ] Gérer le cas où aucun fichier n'est envoyé (`null` ou `Fichier` vide)
-  - [ ] Si autre type : garder le comportement actuel (type simple / objet)
-- [ ] Créer la méthode du controller
-  - [ ] Signature : `public ModelAndView upload(Fichier fichier)`
-  - [ ] Relier formulaire → URL → FrontServlet → controller
-- [ ] Tester
-  - [ ] Envoyer un petit fichier et vérifier `nom`, `typeContenu` et `taille`
-  - [ ] Vérifier que le contenu est identique à l'original
-  - [ ] Tester sans fichier
-  - [ ] Tester avec un fichier + des champs texte
-  - [ ] Vérifier que le binding simple et le binding objet marchent toujours
+- [x] Préparer le formulaire
+  - [x] Ajouter `enctype="multipart/form-data"` et `method="post"`
+  - [x] Ajouter un `<input type="file" name="...">`
+  - [x] Garder un champ texte normal pour vérifier que le mélange texte + fichier marche
+- [x] Activer le multipart dans le framework
+  - [x] Ajouter `@MultipartConfig` sur le `FrontControllerServlet`
+  - [x] Vérifier que les requêtes non multipart gardent le même chemin de traitement
+- [x] Modifier `Util.getParameter(...)`
+  - [x] Détecter si le paramètre de la méthode est de type `Fichier`
+  - [x] Si oui : récupérer la `Part` correspondante avec `request.getPart(nom)`
+  - [x] Remplir l'objet `Fichier` (nom, type, taille, contenu) à partir de la `Part`
+  - [x] Gérer le cas où aucun fichier n'est envoyé (`null`)
+  - [x] Si autre type : garder le comportement actuel (type simple / objet)
+- [x] Créer la méthode du controller
+  - [x] Signature du test mixte : `public ModelAndView upload(Employe employe, Poste poste, Fichier fichier)`
+  - [x] Relier formulaire → URL → FrontServlet → controller
+- [x] Enregistrer le fichier dans le projet de test
+  - [x] Lire le dossier cible dans `phoenix-test-fixed/webapp/WEB-INF/upload.properties`
+  - [x] Créer le dossier si nécessaire et éviter l'écrasement avec un nom unique
+- [X] Tester
+  - [x] Envoyer un petit fichier et vérifier `nom`, `typeContenu` et `taille`
+  - [x] Vérifier que le contenu est identique à l'original
+  - [x] Tester sans fichier
+  - [X] Tester avec un fichier + des champs texte
+  - [X] Vérifier que le binding simple et le binding objet marchent toujours
 ---
 
 ## Déploiement
