@@ -123,6 +123,42 @@ Objectif : pouvoir recevoir un objet (ex: `Employe`) dans la méthode du control
   - [x] Envoyer le formulaire
   - [x] Vérifier que l’objet est bien créé et rempli (`nom`, `poste`…)
   - [x] Vérifier que le binding simple continue de marcher
+
+### Sprint-8 : Upload fichier
+Objectif : dans le formulaire on pourra envoyer un fichier, le fichier pourra etre traiter dans le framework, face au solution propose voici ce que j'ai pris :
+Voici une version du Sprint-8 dans le même format que le 7 :
+
+### Sprint-8 : Upload fichier
+Objectif : pouvoir envoyer un fichier depuis un formulaire et le récupérer dans la méthode du controller sous forme d'un objet `Fichier`, en réutilisant le mécanisme de binding existant.
+- [x] Créer la classe `Fichier`
+  - [x] Constructeur sans argument
+  - [x] Propriétés : `nom`, `typeContenu`, `taille`, `contenu` (`byte[]`)
+  - [x] Getters / setters
+- [x] Préparer le formulaire
+  - [x] Ajouter `enctype="multipart/form-data"` et `method="post"`
+  - [x] Ajouter un `<input type="file" name="...">`
+  - [x] Garder un champ texte normal pour vérifier que le mélange texte + fichier marche
+- [x] Activer le multipart dans le framework
+  - [x] Ajouter `@MultipartConfig` sur le `FrontControllerServlet`
+  - [x] Vérifier que les requêtes non multipart gardent le même chemin de traitement
+- [x] Modifier `Util.getParameter(...)`
+  - [x] Détecter si le paramètre de la méthode est de type `Fichier`
+  - [x] Si oui : récupérer la `Part` correspondante avec `request.getPart(nom)`
+  - [x] Remplir l'objet `Fichier` (nom, type, taille, contenu) à partir de la `Part`
+  - [x] Gérer le cas où aucun fichier n'est envoyé (`null`)
+  - [x] Si autre type : garder le comportement actuel (type simple / objet)
+- [x] Créer la méthode du controller
+  - [x] Signature du test mixte : `public ModelAndView upload(Employe employe, Poste poste, Fichier fichier)`
+  - [x] Relier formulaire → URL → FrontServlet → controller
+- [x] Enregistrer le fichier dans le projet de test
+  - [x] Lire le dossier cible dans `phoenix-test-fixed/webapp/WEB-INF/upload.properties`
+  - [x] Créer le dossier si nécessaire et éviter l'écrasement avec un nom unique
+- [X] Tester
+  - [x] Envoyer un petit fichier et vérifier `nom`, `typeContenu` et `taille`
+  - [x] Vérifier que le contenu est identique à l'original
+  - [x] Tester sans fichier
+  - [X] Tester avec un fichier + des champs texte
+  - [X] Vérifier que le binding simple et le binding objet marchent toujours
 ---
 
 ## Déploiement

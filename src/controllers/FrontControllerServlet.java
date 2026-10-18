@@ -3,6 +3,7 @@ package controllers;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,6 +21,7 @@ import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Map;
 
+@MultipartConfig
 public class FrontControllerServlet extends HttpServlet {
 
     private List<String> controllerNames;
@@ -69,21 +71,13 @@ public class FrontControllerServlet extends HttpServlet {
             boolean isApi = method.isAnnotationPresent(ApiWeb.class);
 
             Object result;
-            Map<String, String[]> parameterMap = req.getParameterMap();
-
             if (Util.haveParameter(method, WebApplicationContext.class)) {
                 if (springContext == null) {
                     throw new ServletException("Le controller attend un WebApplicationContext mais aucun springContext n'est disponible");
                 }
-                result = method.invoke(controllerInstance, springContext);
-
-            } else if (!parameterMap.isEmpty()) {
-                Object[] args = Util.getParameter(method, req);
-                result = method.invoke(controllerInstance, args);
-
-            } else {
-                result = method.invoke(controllerInstance);
             }
+            Object[] args = Util.getParameter(method, req, springContext);
+            result = method.invoke(controllerInstance, args);
 
             handleResult(result, req, resp, isApi);
 
@@ -99,18 +93,20 @@ public class FrontControllerServlet extends HttpServlet {
             // Sprint-6 : si la méthode renvoie déjà une String, on considère
             // qu'elle a déjà produit du JSON elle-même -> pas de ré-encodage.
             // Sinon (objet quelconque), on le convertit en JSON via Jackson.
-            String jsonResponse = (result instanceof String s) ? s : ObjectToJson(result);
+            String jsonResponse = (result instanceof String) ? (String) result : ObjectToJson(result);
             resp.getWriter().write(jsonResponse);
             return;
         } 
-        if (result instanceof ModelAndView modelAndView) {
+        if (result instanceof ModelAndView) {
+            ModelAndView modelAndView = (ModelAndView) result;
             for (Map.Entry<String, Object> attr : modelAndView.getAttributes().entrySet()) {
                 req.setAttribute(attr.getKey(), attr.getValue());
             }
             String path = viewResolver.resolveViewName(modelAndView.getViewName());
             RequestDispatcher dispatcher = req.getRequestDispatcher(path);
             dispatcher.forward(req, resp);
-        } else if (result instanceof String viewName) {
+        } else if (result instanceof String) {
+            String viewName = (String) result;
             String path = viewResolver.resolveViewName(viewName);
             req.getRequestDispatcher(path).forward(req, resp);
         } else {
