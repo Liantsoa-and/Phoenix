@@ -159,7 +159,44 @@ Objectif : pouvoir envoyer un fichier depuis un formulaire et le récupérer dan
   - [x] Tester sans fichier
   - [X] Tester avec un fichier + des champs texte
   - [X] Vérifier que le binding simple et le binding objet marchent toujours
+
+### Sprint-9 : Session
+
+Objectif : rendre disponible la session HTTP de manière transparente dans les controllers de l'application développeur. Plutôt que d'exposer directement le `HttpSession` du servlet container, le framework encapsule la session dans une classe `PhoenixSession` qu'il injecte automatiquement dans les méthodes de controllers qui la demandent, exactement comme il le fait pour `ApplicationContext`. Le développeur peut ainsi lire et écrire des attributs en session sans jamais toucher aux APIs Jakarta.
+
+- [ ] **Créer la classe `PhoenixSession`** (dans le package `session` du framework)
+  - [ ] Constructeur `PhoenixSession(HttpSession session)` — reçoit le `HttpSession` natif de Jakarta
+  - [ ] `setAttribute(String key, Object value)`
+  - [ ] `getAttribute(String key, Class<T> type)` — récupère et caste automatiquement
+  - [ ] `removeAttribute(String key)`
+  - [ ] `getAttributes()` → retourne une `Map<String, Object>` de tous les attributs courants
+  - [ ] `clear()` — vide tous les attributs de la session
+  - [ ] `getId()` — retourne l'ID de la session sous-jacente
+
+- [ ] **Modifier `Util.getParameter()`** pour injecter `PhoenixSession`
+  - [ ] Ajouter un cas dans la boucle de résolution des paramètres :
+    - si le type du paramètre est `PhoenixSession` → appeler `req.getSession()` puis wrapper dans `new PhoenixSession(httpSession)`
+  - [ ] Ce cas s'ajoute aux cas existants (`WebApplicationContext`, `Fichier`, types simples, objets)
+  - [ ] `haveParameter(method, PhoenixSession.class)` fonctionne déjà tel quel (pas de modification nécessaire)
+
+- [ ] **Modifier `FrontControllerServlet.processRequest()`**
+  - [ ] Passer `req` à `Util.getParameter()` — c'est déjà le cas ✅
+  - [ ] Aucun autre changement dans le servlet : l'injection est entièrement gérée par `Util`
+
+- [ ] **Mettre à jour l'application témoin**
+  - [ ] Dans un controller existant, ajouter `PhoenixSession session` comme paramètre d'une méthode
+  - [ ] Faire un `session.setAttribute("requestCount", count + 1)` à chaque appel
+  - [ ] Exposer un endpoint `GET /api/session` → retourne `session.getAttributes()` en JSON (debug)
+  - [ ] Exposer un endpoint `GET /api/session/reset` → appelle `session.clear()`, retourne `"OK"`
+
+- [ ] **Tester**
+  - [ ] Appeler une route plusieurs fois → vérifier que le compteur en session s'incrémente
+  - [ ] Vérifier que `GET /api/session` liste bien tous les attributs de la session en cours
+  - [ ] Vérifier que `GET /api/session/reset` efface bien tous les attributs
+  - [ ] Vérifier que les fonctionnalités précédentes (binding, upload, Spring context) continuent de fonctionner
+
 ---
+
 
 ## Déploiement
 
