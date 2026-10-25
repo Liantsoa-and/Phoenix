@@ -161,39 +161,35 @@ Objectif : pouvoir envoyer un fichier depuis un formulaire et le récupérer dan
   - [X] Vérifier que le binding simple et le binding objet marchent toujours
 
 ### Sprint-9 : Session
-
 Objectif : rendre disponible la session HTTP de manière transparente dans les controllers de l'application développeur. Plutôt que d'exposer directement le `HttpSession` du servlet container, le framework encapsule la session dans une classe `PhoenixSession` qu'il injecte automatiquement dans les méthodes de controllers qui la demandent, exactement comme il le fait pour `ApplicationContext`. Le développeur peut ainsi lire et écrire des attributs en session sans jamais toucher aux APIs Jakarta.
-
-- [ ] **Créer la classe `PhoenixSession`** (dans le package `session` du framework)
-  - [ ] Constructeur `PhoenixSession(HttpSession session)` — reçoit le `HttpSession` natif de Jakarta
-  - [ ] `setAttribute(String key, Object value)`
-  - [ ] `getAttribute(String key, Class<T> type)` — récupère et caste automatiquement
-  - [ ] `removeAttribute(String key)`
-  - [ ] `getAttributes()` → retourne une `Map<String, Object>` de tous les attributs courants
-  - [ ] `clear()` — vide tous les attributs de la session
-  - [ ] `getId()` — retourne l'ID de la session sous-jacente
-
-- [ ] **Modifier `Util.getParameter()`** pour injecter `PhoenixSession`
-  - [ ] Ajouter un cas dans la boucle de résolution des paramètres :
-    - si le type du paramètre est `PhoenixSession` → appeler `req.getSession()` puis wrapper dans `new PhoenixSession(httpSession)`
-  - [ ] Ce cas s'ajoute aux cas existants (`WebApplicationContext`, `Fichier`, types simples, objets)
-  - [ ] `haveParameter(method, PhoenixSession.class)` fonctionne déjà tel quel (pas de modification nécessaire)
-
-- [ ] **Modifier `FrontControllerServlet.processRequest()`**
-  - [ ] Passer `req` à `Util.getParameter()` — c'est déjà le cas ✅
-  - [ ] Aucun autre changement dans le servlet : l'injection est entièrement gérée par `Util`
-
-- [ ] **Mettre à jour l'application témoin**
-  - [ ] Dans un controller existant, ajouter `PhoenixSession session` comme paramètre d'une méthode
-  - [ ] Faire un `session.setAttribute("requestCount", count + 1)` à chaque appel
-  - [ ] Exposer un endpoint `GET /api/session` → retourne `session.getAttributes()` en JSON (debug)
-  - [ ] Exposer un endpoint `GET /api/session/reset` → appelle `session.clear()`, retourne `"OK"`
-
-- [ ] **Tester**
-  - [ ] Appeler une route plusieurs fois → vérifier que le compteur en session s'incrémente
-  - [ ] Vérifier que `GET /api/session` liste bien tous les attributs de la session en cours
-  - [ ] Vérifier que `GET /api/session/reset` efface bien tous les attributs
-  - [ ] Vérifier que les fonctionnalités précédentes (binding, upload, Spring context) continuent de fonctionner
+- [ ] **Finaliser le contrat de `PhoenixSession`** (package `session`)
+  - [x] Garder une référence privée et finale au `HttpSession`; ne pas maintenir une copie locale des attributs, afin que les lectures reflètent toujours la session réelle
+  - [x] Conserver le constructeur `PhoenixSession(HttpSession session)`
+  - [x] Implémenter `setAttribute(String key, Object value)` et `removeAttribute(String key)` en déléguant au `HttpSession`
+  - [x] Implémenter `getAttribute(String key)` et `getAttribute(String key, Class<T> type)`; la variante typée vérifie le type et signale clairement une incompatibilité
+  - [x] Implémenter `getAttributes()` comme une copie des attributs présents dans le `HttpSession`, pour que modifier la map retournée ne modifie pas implicitement la session
+  - [x] Implémenter `clear()` en supprimant tous les attributs présents dans le `HttpSession`
+  - [x] Implémenter `getId()` en retournant l'ID de la session sous-jacente
+- [x] **Injecter `PhoenixSession` dans `Util.getParameter()`**
+  - [x] Ajouter un cas explicite pour le type `PhoenixSession` avant le binding générique des objets
+  - [x] Construire le wrapper avec `new PhoenixSession(req.getSession())`; la session est ainsi créée lorsqu'une méthode de controller demande ce paramètre
+  - [x] Garder la résolution existante de `WebApplicationContext`, `Fichier`, des types simples et des objets inchangée
+  - [x] Vérifier que `haveParameter(method, PhoenixSession.class)` reconnaît bien le paramètre; la méthode générique actuelle devrait déjà le faire
+- [x] **Valider l'injection par le FrontController**
+  - [x] Confirmer que `FrontControllerServlet.processRequest()` transmet toujours `req` à `Util.getParameter()` — c'est déjà le cas dans le code actuel
+  - [x] Vérifier qu'une méthode de controller avec `PhoenixSession` reçoit le wrapper et que l'invocation continue de fonctionner avec d'autres paramètres
+- [x] **Ajouter un scénario dans l'application témoin**
+  - [x] Ajouter `PhoenixSession` à une méthode de controller existante ou à un controller de démonstration
+  - [x] Incrémenter un attribut `requestCount` à chaque appel afin de vérifier la persistance entre requêtes
+  - [x] Ajouter `GET /api/session` qui retourne les attributs en JSON pour observer la session courante
+  - [x] Ajouter `GET /api/session/reset` qui appelle `clear()` et retourne `"OK"`
+- [x] **Vérifier le Sprint 9 et les fonctions déjà présentes**
+  - [x] Appeler plusieurs fois la route de compteur avec le même cookie de session et vérifier l'incrémentation
+  - [x] Vérifier les lectures typées et non typées, l'ajout, la suppression, l'ID et la liste des attributs
+  - [x] Réinitialiser la session et vérifier que les attributs ont été supprimés
+  - [x] Vérifier l'injection de `PhoenixSession` en même temps que les paramètres simples, les objets, `Fichier` et `WebApplicationContext`
+  - [x] Vérifier que le comportement des sprints précédents (binding, upload et contexte Spring) reste opérationnel
+  Validation : compilation du framework et de l'application témoin, tests des opérations du wrapper et du binding combiné avec un contexte Spring simulé, puis appels HTTP sur un Tomcat temporaire au port 18080. Le compteur a renvoyé 1 puis 2 avec le même `JSESSIONID`; après reset, il est reparti à 1. Le binding objet et l'upload multipart ont également répondu correctement.
 
 ---
 
