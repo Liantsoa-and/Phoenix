@@ -5,6 +5,7 @@ import jakarta.servlet.http.Part;
 import jakarta.servlet.http.HttpServletRequest;
 import models.Fichier;
 import org.springframework.web.context.WebApplicationContext;
+import session.PhoenixSession;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,6 +56,7 @@ public class Util {
     /**
      * Construit les arguments de la méthode du controller.
      * - WebApplicationContext  -> injecte le springContext
+     * - PhoenixSession         -> enveloppe la session HTTP de la requête
      * - type simple            -> req.getParameter(nomDuParamètre)
      * - tableau / List         -> req.getParameterValues(nomDuParamètre)
      * - objet                  -> binding via "nomDuParamètre.propriété"
@@ -75,6 +77,8 @@ public class Util {
 
             if (type == WebApplicationContext.class) {
                 value = springContext;
+            } else if (type == PhoenixSession.class) {
+                value = new PhoenixSession(req.getSession());
             } else if (type == Fichier.class) {
                 value = resolveFile(name, req);
             } else if (isSimpleType(type) || isMultiValued(type)) {
