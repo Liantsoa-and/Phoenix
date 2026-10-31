@@ -11,6 +11,7 @@ import models.ModelAndView;
 import models.ViewResolver;
 import annotation.ApiWeb;
 import annotation.Auth;
+import annotation.RoleRequired;
 import org.springframework.web.context.WebApplicationContext;
 import utils.UrlEntry;
 import utils.Util;
@@ -101,7 +102,8 @@ public class FrontControllerServlet extends HttpServlet {
         if (auth == null) {
             auth = controllerClass.getAnnotation(Auth.class);
         }
-        if (auth == null) {
+        RoleRequired roleRequired = method.getAnnotation(RoleRequired.class);
+        if (auth == null && roleRequired == null) {
             return true;
         }
 
@@ -118,13 +120,19 @@ public class FrontControllerServlet extends HttpServlet {
             return false;
         }
 
-        String requiredRole = auth.role().trim();
-        if (requiredRole.isEmpty() || hasRole(roles, requiredRole)) {
-            return true;
+        if (auth != null) {
+            String requiredRole = auth.role().trim();
+            if (!requiredRole.isEmpty() && !hasRole(roles, requiredRole)) {
+                ResponseHelper.handleForbidden(resp, isApi);
+                return false;
+            }
         }
 
-        ResponseHelper.handleForbidden(resp, isApi);
-        return false;
+        if (roleRequired != null && !hasAnyRole(roles, roleRequired.value())) {
+            ResponseHelper.handleForbidden(resp, isApi);
+            return false;
+        }
+        return true;
     }
 
     private boolean hasRole(Object roles, String requiredRole) {
@@ -136,6 +144,16 @@ public class FrontControllerServlet extends HttpServlet {
                 if (requiredRole.equals(String.valueOf(role).trim())) {
                     return true;
                 }
+            }
+        }
+        return false;
+    }
+
+    private boolean hasAnyRole(Object userRoles, String[] requiredRoles) {
+        for (String requiredRole : requiredRoles) {
+            if (requiredRole != null && !requiredRole.trim().isEmpty()
+                    && hasRole(userRoles, requiredRole.trim())) {
+                return true;
             }
         }
         return false;
