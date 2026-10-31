@@ -12,11 +12,14 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.lang.reflect.InvocationTargetException;
 
 public class AppInitializer implements ServletContextListener {
 
     public static final String AUTH_ROLE_SESSION_ATTRIBUTE = "phoenix.authRoleSessionAttribute";
     public static final String AUTH_ROLE_SESSION_ATTRIBUTE_PARAM = "authRoleSessionAttribute";
+    public static final String CONTROLLER_INSTANCES_ATTRIBUTE = "phoenix.controllerInstances";
 
     // Sprint 5-bis : clé d'attribut sous laquelle Spring stocke son WebApplicationContext racine
     private static final String SPRING_ROOT = "org.springframework.web.context.WebApplicationContext.ROOT";
@@ -31,10 +34,13 @@ public class AppInitializer implements ServletContextListener {
                         ? "role" : roleAttribute.trim());
 
         Map<String, UrlEntry> routes = new HashMap<>();
+        Map<Class<?>, Object> controllerInstances = new ConcurrentHashMap<>();
         List<Class<?>> controllers = ClassScanner.getClasses("controllers", Controller.class);
         for (Class<?> controllerClass : controllers) {
+            controllerInstances.put(controllerClass, instantiateController(controllerClass));
             registerController(controllerClass, routes);
         }
+        servletContext.setAttribute(CONTROLLER_INSTANCES_ATTRIBUTE, controllerInstances);
         servletContext.setAttribute("routes", routes);
 
         // Sprint 5-bis : on récupère le contexte Spring déjà chargé par ContextLoaderListener
@@ -58,6 +64,19 @@ public class AppInitializer implements ServletContextListener {
                 String key = mapping.method() + ":" + mapping.value();
                 routes.put(key, new UrlEntry(mapping.value(), controllerName, method, mapping.method()));
             }
+        }
+    }
+
+    private Object instantiateController(Class<?> controllerClass) {
+        try {
+            return controllerClass.getDeclaredConstructor().newInstance();
+        } catch (InvocationTargetException e) {
+            Throwable cause = e.getCause() == null ? e : e.getCause();
+            throw new IllegalStateException("Échec de création du contrôleur "
+                    + controllerClass.getName() + " au démarrage", cause);
+        } catch (ReflectiveOperationException | SecurityException e) {
+            throw new IllegalStateException("Impossible d'instancier le contrôleur "
+                    + controllerClass.getName() + " au démarrage. Un constructeur sans argument accessible est requis.", e);
         }
     }
 }

@@ -252,6 +252,33 @@ Objectif : permettre de déclarer sur une méthode les rôles autorisés à l’
   - [x] Vérifier que la méthode protégée n’est pas appelée après un refus.
   - [x] Vérifier les réponses 401 et 403 en JSON et en HTML.
 
+## Sprint-11 : Contrôleurs singleton
+
+Objectif : créer chaque contrôleur une seule fois au démarrage de l’application, puis réutiliser son instance pour traiter les requêtes.
+
+- [x] **Créer les instances des contrôleurs au démarrage**
+  - [x] Parcourir les contrôleurs détectés par `AppInitializer`.
+  - [x] Instancier chaque contrôleur une seule fois.
+  - [x] Enregistrer chaque instance dans une map `Map<Class<?>, Object>`.
+  - [x] Stocker cette map dans le `ServletContext`.
+
+- [x] **Réutiliser les instances dans le `FrontControllerServlet`**
+  - [x] Récupérer la map des contrôleurs depuis le `ServletContext`.
+  - [x] Pour chaque route, retrouver l’instance correspondant à la classe du contrôleur.
+  - [x] Appeler la méthode demandée sur cette instance avec les arguments de la requête.
+  - [x] Retirer la création du contrôleur à chaque requête.
+
+- [x] **Vérifier le cycle de vie des contrôleurs**
+  - [x] Vérifier qu’une instance est créée par classe de contrôleur au démarrage.
+  - [x] Vérifier que plusieurs requêtes vers le même contrôleur utilisent la même instance.
+  - [x] Vérifier que les différentes routes d’un même contrôleur partagent cette instance.
+  - [x] Vérifier qu’une erreur de création d’un contrôleur est signalée au démarrage.
+
+- [x] **Vérifier la sécurité en cas de requêtes simultanées**
+  - [x] Garder les données propres à une requête dans les paramètres ou les variables locales.
+  - [x] Vérifier qu’aucune donnée d’une requête ne fuit vers une autre requête.
+  - [x] Vérifier que le traitement des requêtes simultanées reste correct.
+
 ---
 
 ## Déploiement

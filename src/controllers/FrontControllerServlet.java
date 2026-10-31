@@ -20,15 +20,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.util.List;
 import java.util.Map;
 
 @MultipartConfig
 public class FrontControllerServlet extends HttpServlet {
 
-    private List<String> controllerNames;
-    private Map<String, UrlEntry> routes;
     private ViewResolver viewResolver;
 
     public FrontControllerServlet() {
@@ -48,7 +44,9 @@ public class FrontControllerServlet extends HttpServlet {
     @SuppressWarnings("unchecked")
     private void processRequest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         ServletContext servletContext = getServletContext();
-        this.routes = (Map<String, UrlEntry>) servletContext.getAttribute("routes");
+        Map<String, UrlEntry> routes = (Map<String, UrlEntry>) servletContext.getAttribute("routes");
+        Map<Class<?>, Object> controllerInstances = (Map<Class<?>, Object>)
+                servletContext.getAttribute(listeners.AppInitializer.CONTROLLER_INSTANCES_ATTRIBUTE);
 
         String path = req.getPathInfo();
         if (path == null) {
@@ -67,13 +65,18 @@ public class FrontControllerServlet extends HttpServlet {
         try {
             WebApplicationContext springContext = (WebApplicationContext) servletContext.getAttribute("springContext");
 
-            Object controllerInstance = Class.forName(entry.getControllerName())
-                    .getDeclaredConstructor().newInstance();
+            Class<?> controllerClass = Class.forName(entry.getControllerName());
+            Object controllerInstance = controllerInstances == null
+                    ? null : controllerInstances.get(controllerClass);
+            if (controllerInstance == null) {
+                throw new ServletException("Instance singleton introuvable pour le contrôleur "
+                        + entry.getControllerName());
+            }
             Method method = entry.getMethod();
 
             boolean isApi = method.isAnnotationPresent(ApiWeb.class);
 
-            if (!checkAuthorization(controllerInstance.getClass(), method, req, resp,
+            if (!checkAuthorization(controllerClass, method, req, resp,
                     servletContext, isApi)) {
                 return;
             }
