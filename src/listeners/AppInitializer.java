@@ -15,12 +15,20 @@ import java.util.Map;
 
 public class AppInitializer implements ServletContextListener {
 
+    public static final String AUTH_ROLE_SESSION_ATTRIBUTE = "phoenix.authRoleSessionAttribute";
+    public static final String AUTH_ROLE_SESSION_ATTRIBUTE_PARAM = "authRoleSessionAttribute";
+
     // Sprint 5-bis : clé d'attribut sous laquelle Spring stocke son WebApplicationContext racine
     private static final String SPRING_ROOT = "org.springframework.web.context.WebApplicationContext.ROOT";
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         ServletContext servletContext = sce.getServletContext();
+
+        String roleAttribute = servletContext.getInitParameter(AUTH_ROLE_SESSION_ATTRIBUTE_PARAM);
+        servletContext.setAttribute(AUTH_ROLE_SESSION_ATTRIBUTE,
+                roleAttribute == null || roleAttribute.trim().isEmpty()
+                        ? "role" : roleAttribute.trim());
 
         Map<String, UrlEntry> routes = new HashMap<>();
         List<Class<?>> controllers = ClassScanner.getClasses("controllers", Controller.class);

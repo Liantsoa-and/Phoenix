@@ -194,6 +194,39 @@ Objectif : rendre disponible la session HTTP de manière transparente dans les c
 ---
 
 
+## Sprint-10 : Authentification et autorisation
+
+Objectif : protéger les routes du framework avec une annotation déclarable sur une classe ou une méthode. Une session authentifiée suffit si aucun rôle n'est demandé; si un rôle est précisé, l'utilisateur doit le posséder. Un refus doit produire une réponse HTTP 401 (non authentifié) ou 403 (rôle insuffisant), en JSON pour les routes API et en HTML pour les pages.
+
+- [x] **Définir l'annotation `Auth`**
+  - [x] Créer `@Auth` avec les cibles `TYPE` et `METHOD` et une rétention à l'exécution.
+  - [x] Ajouter `role()` avec `""` comme valeur par défaut.
+  - [x] Documenter le contrat : rôle vide = authentification seule; rôle renseigné = authentification et rôle exigé.
+- [ ] **Rendre la configuration d'authentification accessible au contrôleur**
+  - [x] Charger depuis `web.xml` le nom de l'attribut de session contenant le ou les rôles de l'utilisateur.
+  - [x] Publier cette valeur dans le `ServletContext` depuis `FrontServletContextListener` et la lire dans `FrontServletController`.
+  - [ ] Mettre à jour la configuration de `test-source` et préciser le nom de l'attribut testé.
+- [x] **Centraliser les réponses d'accès refusé dans `ResponseHelper`**
+  - [x] Ajouter `handleUnauthorized` pour les requêtes sans utilisateur authentifié (HTTP 401).
+  - [x] Ajouter `handleForbidden` pour les utilisateurs authentifiés sans le rôle demandé (HTTP 403).
+  - [x] Produire du JSON pour les routes API et du HTML pour les pages, avec un choix de format cohérent avec le type de route.
+- [x] **Vérifier les autorisations avant l'invocation**
+  - [x] Ajouter `checkAuthorization` dans `FrontController` et l'appeler avant de résoudre/invoquer la méthode.
+  - [x] Chercher `@Auth` sur la méthode d'abord, puis sur la classe seulement si la méthode n'en porte pas.
+  - [x] Définir l'authentification par la présence de l'attribut de session configuré; appeler `handleUnauthorized` s'il manque.
+  - [x] Autoriser l'accès authentifié si `role()` est vide.
+  - [x] Pour un rôle requis, accepter un attribut de session `String` ou une `Collection`; appeler `handleForbidden` si le rôle n'y figure pas.
+  - [x] Interrompre le traitement après une réponse 401 ou 403 afin que la méthode du contrôleur ne soit jamais exécutée.
+- [x] **Compléter les scénarios dans `test-source`**
+  - [x] Protéger des routes avec `@Auth` au niveau classe et au niveau méthode.
+  - [x] Vérifier qu'une annotation de méthode remplace celle de la classe, y compris un rôle vide.
+  - [x] Vérifier l'accès authentifié sans rôle requis, l'accès avec le bon rôle et le refus avec un rôle absent.
+  - [x] Couvrir les attributs de rôle sous forme de `String` et de `Collection`.
+  - [x] Vérifier les réponses 401/403 en JSON pour une API et en HTML pour une page.
+  - [x] Vérifier qu'aucun contrôleur protégé n'est invoqué après un refus et que login/logout font évoluer l'accès comme attendu.
+
+---
+
 ## Déploiement
 
 ```bash
