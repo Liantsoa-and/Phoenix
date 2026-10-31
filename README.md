@@ -225,6 +225,33 @@ Objectif : protéger les routes du framework avec une annotation déclarable sur
   - [x] Vérifier les réponses 401/403 en JSON pour une API et en HTML pour une page.
   - [x] Vérifier qu'aucun contrôleur protégé n'est invoqué après un refus et que login/logout font évoluer l'accès comme attendu.
 
+## Sprint-10-bis : Autorisation par rôles
+
+Objectif : permettre de déclarer sur une méthode les rôles autorisés à l’appeler. Par exemple, `@RoleRequired({"admin", "RH"})` autorise les utilisateurs possédant le rôle `admin` **ou** le rôle `RH`.
+
+- [x] **Créer l’annotation `RoleRequired`**
+  - [x] La rendre applicable aux méthodes et disponible à l’exécution.
+  - [x] Lui ajouter un attribut contenant une liste de rôles, par exemple `String[] value()`.
+  - [x] Utiliser l’annotation ainsi : `@RoleRequired({"admin", "RH"})`.
+
+- [x] **Vérifier les rôles avant l’appel de la méthode**
+  - [x] Lire les rôles autorisés dans `@RoleRequired`.
+  - [x] Récupérer le rôle ou les rôles de l’utilisateur depuis l’attribut de session configuré.
+  - [x] Autoriser l’appel si l’utilisateur possède au moins un des rôles déclarés.
+  - [x] Refuser l’accès si aucun rôle ne correspond et ne pas appeler la méthode du contrôleur.
+
+- [x] **Gérer les accès refusés**
+  - [x] Retourner HTTP 401 si l’utilisateur n’est pas authentifié.
+  - [x] Retourner HTTP 403 si l’utilisateur est authentifié, mais ne possède aucun rôle autorisé.
+  - [x] Renvoyer une erreur JSON pour une route API et une erreur HTML pour une page.
+
+- [x] **Ajouter des scénarios de test**
+  - [x] Vérifier l’accès avec chacun des rôles autorisés.
+  - [x] Vérifier le refus avec un rôle non autorisé.
+  - [x] Vérifier le refus pour un utilisateur non authentifié.
+  - [x] Vérifier que la méthode protégée n’est pas appelée après un refus.
+  - [x] Vérifier les réponses 401 et 403 en JSON et en HTML.
+
 ---
 
 ## Déploiement
