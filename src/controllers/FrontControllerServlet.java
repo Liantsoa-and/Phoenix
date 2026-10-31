@@ -10,9 +10,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import models.ModelAndView;
 import models.ViewResolver;
 import annotation.ApiWeb;
+import annotation.Auth;
 import org.springframework.web.context.WebApplicationContext;
 import utils.UrlEntry;
 import utils.Util;
+import utils.ResponseHelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -70,6 +72,11 @@ public class FrontControllerServlet extends HttpServlet {
 
             boolean isApi = method.isAnnotationPresent(ApiWeb.class);
 
+            if (!checkAuthorization(controllerInstance.getClass(), method, req, resp,
+                    servletContext, isApi)) {
+                return;
+            }
+
             Object result;
             if (Util.haveParameter(method, WebApplicationContext.class)) {
                 if (springContext == null) {
@@ -84,6 +91,54 @@ public class FrontControllerServlet extends HttpServlet {
         } catch (ReflectiveOperationException e) {
             throw new ServletException("Erreur lors de l'invocation du controller", e);
         }
+    }
+
+    private boolean checkAuthorization(Class<?> controllerClass, Method method,
+                                       HttpServletRequest req, HttpServletResponse resp,
+                                       ServletContext servletContext, boolean isApi)
+            throws IOException {
+        Auth auth = method.getAnnotation(Auth.class);
+        if (auth == null) {
+            auth = controllerClass.getAnnotation(Auth.class);
+        }
+        if (auth == null) {
+            return true;
+        }
+
+        String roleAttribute = (String) servletContext.getAttribute(
+                listeners.AppInitializer.AUTH_ROLE_SESSION_ATTRIBUTE);
+        if (roleAttribute == null || roleAttribute.trim().isEmpty()) {
+            roleAttribute = "role";
+        }
+
+        jakarta.servlet.http.HttpSession session = req.getSession(false);
+        Object roles = session == null ? null : session.getAttribute(roleAttribute);
+        if (roles == null) {
+            ResponseHelper.handleUnauthorized(resp, isApi);
+            return false;
+        }
+
+        String requiredRole = auth.role().trim();
+        if (requiredRole.isEmpty() || hasRole(roles, requiredRole)) {
+            return true;
+        }
+
+        ResponseHelper.handleForbidden(resp, isApi);
+        return false;
+    }
+
+    private boolean hasRole(Object roles, String requiredRole) {
+        if (roles instanceof String) {
+            return requiredRole.equals(((String) roles).trim());
+        }
+        if (roles instanceof java.util.Collection<?>) {
+            for (Object role : (java.util.Collection<?>) roles) {
+                if (requiredRole.equals(String.valueOf(role).trim())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private void handleResult(Object result, HttpServletRequest req, HttpServletResponse resp, boolean isApi) throws ServletException, IOException {
